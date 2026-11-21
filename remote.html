@@ -7,23 +7,40 @@
     body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
     input { width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; box-sizing: border-box; }
     button { width: 100%; padding: 14px; background: #5a4bda; color: #fff; border: none; font-size: 18px; cursor: pointer; }
+    #msg { margin-top: 15px; font-family: monospace; color: #0f0; word-break: break-all; }
   </style>
 </head>
 <body>
   <h2>Cast Lecture to LG TV</h2>
   <input type="text" id="urlInput" placeholder="Paste .m3u8 or .mp4 stream URL here...">
   <button onclick="sendToTV()">Play on TV</button>
-  <p id="msg"></p>
+  <p id="msg">Ready.</p>
 
   <script>
     var DB_URL = "https://firebasedatabase.app";
     function sendToTV() {
       var url = document.getElementById("urlInput").value.trim();
+      var msg = document.getElementById("msg");
+      if (!url) {
+        msg.innerText = "Error: Paste a link first!";
+        return;
+      }
+      msg.innerText = "Sending to Firebase...";
       fetch(DB_URL, {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url, updated: Date.now() })
-      }).then(() => {
-        document.getElementById("msg").innerText = "Sent! TV will start playing in ~3 seconds.";
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.url) {
+          msg.innerText = "SUCCESS! Saved to Firebase: " + data.url;
+        } else {
+          msg.innerText = "Firebase blocked write: " + JSON.stringify(data);
+        }
+      })
+      .catch(function(err) {
+        msg.innerText = "Network Error: " + err;
       });
     }
   </script>
