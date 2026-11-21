@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Send to TV</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
+    input { width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; box-sizing: border-box; }
+    button { width: 100%; padding: 14px; background: #5a4bda; color: #fff; border: none; font-size: 18px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Cast Lecture to LG TV</h2>
+  <input type="text" id="urlInput" placeholder="Paste .m3u8 or .mp4 stream URL here...">
+  <button onclick="sendToTV()">Play on TV</button>
+  <p id="msg"></p>
+
+  <script>
+    var DB_URL = "https://firebasedatabase.app";
+    function sendToTV() {
+      var url = document.getElementById("urlInput").value.trim();
+      fetch(DB_URL, {
+        method: "PUT",
+        body: JSON.stringify({ url: url, updated: Date.now() })
+      }).then(() => {
+        document.getElementById("msg").innerText = "Sent! TV will start playing in ~3 seconds.";
+      });
+    }
+  </script>
+</body>
+</html>
